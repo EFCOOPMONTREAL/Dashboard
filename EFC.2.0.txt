@@ -1,7 +1,3 @@
-
----
-layout: null
----
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
@@ -177,9 +173,12 @@ tbody tr{cursor:pointer}
 <div class="chart-card full"><h3>Entreprises par secteur d'activité</h3><canvas id="ch-secteur"></canvas></div>
 <div class="chart-card full"><h3>Maturité EF / EFC</h3><canvas id="ch-maturite"></canvas></div>
 <div class="chart-card full"><h3>Maturité / Activité de l'entreprise</h3><canvas id="ch-mat-act"></canvas></div>
-<div class="chart-card full"><h3>Leviers les plus présents — Entreprises « En place » par secteur d'activité</h3><canvas id="ch-leviers"></canvas></div>
 <div class="chart-card full"><h3>Freins des projets EF/EFC en développement / non abouti</h3><canvas id="ch-freins-global"></canvas></div>
-<div class="chart-card full"><h3>Entreprises — Freins (en développement et non abouti) par catégorie</h3><canvas id="ch-freins-cat"></canvas></div>
+<div class="chart-card full"><h3>Catégorie d'activité / Freins — Synthèse</h3><canvas id="ch-synthese"></canvas>
+<button onclick="var d=document.getElementById('detail-histos');if(d.style.display==='none'){d.style.display='block';this.textContent='▼ Masquer le détail'}else{d.style.display='none';this.textContent='▶ Voir le détail par catégorie d\'activité'}" style="margin-top:12px;padding:8px 20px;font-size:13px;font-weight:600;border:2px solid var(--accent);border-radius:20px;background:var(--card);color:var(--accent);cursor:pointer;font-family:inherit;transition:all .15s">▶ Voir le détail par catégorie d'activité</button>
+</div>
+<div id="detail-histos" style="display:none;grid-column:1/-1">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div class="chart-card"><h3>Freins Conception & Fabrication</h3><canvas id="ch-f-concept"></canvas></div>
 <div class="chart-card"><h3>Freins Transformation de Matière</h3><canvas id="ch-f-matiere"></canvas></div>
 <div class="chart-card"><h3>Freins Distribution & Négoce</h3><canvas id="ch-f-distrib"></canvas></div>
@@ -188,8 +187,25 @@ tbody tr{cursor:pointer}
 <div class="chart-card"><h3>Freins Service Numérique / IT</h3><canvas id="ch-f-it"></canvas></div>
 <div class="chart-card"><h3>Freins Service à la Personne</h3><canvas id="ch-f-service"></canvas></div>
 <div class="chart-card"><h3>Freins Logistique & Transport</h3><canvas id="ch-f-logist"></canvas></div>
-<div class="chart-card full"><h3>Freins Gestion de Déchets / Matières</h3><canvas id="ch-f-dechets"></canvas></div>
-<div class="chart-card full"><h3>Catégorie d'activité / Freins — Synthèse</h3><canvas id="ch-synthese"></canvas></div>
+<div class="chart-card" style="grid-column:1/-1"><h3>Freins Gestion de Déchets / Matières</h3><canvas id="ch-f-dechets"></canvas></div>
+</div>
+</div>
+<div class="chart-card full"><h3>Catégorie d'activité / Leviers — Synthèse</h3><canvas id="ch-lev-synthese"></canvas>
+<button onclick="var d=document.getElementById('detail-leviers');if(d.style.display==='none'){d.style.display='block';this.textContent='▼ Masquer le détail des leviers'}else{d.style.display='none';this.textContent='▶ Voir le détail par catégorie d\'activité'}" style="margin-top:12px;padding:8px 20px;font-size:13px;font-weight:600;border:2px solid #0F6E56;border-radius:20px;background:var(--card);color:#0F6E56;cursor:pointer;font-family:inherit;transition:all .15s">▶ Voir le détail par catégorie d'activité</button>
+</div>
+<div id="detail-leviers" style="display:none;grid-column:1/-1">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div class="chart-card"><h3>Leviers Conception & Fabrication</h3><canvas id="ch-l-concept"></canvas></div>
+<div class="chart-card"><h3>Leviers Transformation de Matière</h3><canvas id="ch-l-matiere"></canvas></div>
+<div class="chart-card"><h3>Leviers Distribution & Négoce</h3><canvas id="ch-l-distrib"></canvas></div>
+<div class="chart-card"><h3>Leviers Maintenance & Réparation</h3><canvas id="ch-l-maint"></canvas></div>
+<div class="chart-card"><h3>Leviers Prestation Intellectuelle</h3><canvas id="ch-l-presta"></canvas></div>
+<div class="chart-card"><h3>Leviers Service Numérique / IT</h3><canvas id="ch-l-it"></canvas></div>
+<div class="chart-card"><h3>Leviers Service à la Personne</h3><canvas id="ch-l-service"></canvas></div>
+<div class="chart-card"><h3>Leviers Logistique & Transport</h3><canvas id="ch-l-logist"></canvas></div>
+<div class="chart-card" style="grid-column:1/-1"><h3>Leviers Gestion de Déchets / Matières</h3><canvas id="ch-l-dechets"></canvas></div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -262,7 +278,7 @@ function mxL(){return Math.max(...COMPANIES.map(c=>Math.max(...LK.map(k=>c[k]||0
 function flt(){return COMPANIES.filter(c=>{if(fGeo!=="all"&&norm(c.co.toLowerCase())!==fGeo)return false;if(fMat!=="all"&&c.mat!==fMat)return false;if(sTerm&&!c.n.toLowerCase().includes(sTerm))return false;return true})}
 function bars(keys,colors,labels,c,mx){return keys.map((k,i)=>{const v=c[k]||0;return`<div class="bar-row"><span class="bar-label">${labels[i]}</span><div class="bar-track"><div class="bar-fill" style="width:${mx?v/mx*100:0}%;background:${colors[i]}"></div></div><span class="bar-val">${v}</span></div>`}).join("")}
 
-function renderStats(){const f=flt();document.getElementById("stats").innerHTML=[{n:f.length,l:"Entreprises"},{n:f.filter(c=>c.efc).length,l:"EFC"},{n:f.filter(c=>c.ef&&!c.efc).length,l:"EF"},{n:f.filter(c=>c.mat==="En place").length,l:"En place"},{n:f.filter(c=>c.mat==="En développement").length,l:"En dév."},{n:f.filter(c=>c.co==="France").length,l:"France"},{n:f.filter(c=>c.co==="Québec").length,l:"Québec"}].map(s=>`<div class="stat-card"><div class="num">${s.n}</div><div class="label">${s.l}</div></div>`).join("")}
+function renderStats(){const f=flt();document.getElementById("stats").innerHTML=[{n:f.length,l:"Entreprises"},{n:f.filter(c=>c.efc).length,l:"EFC"},{n:f.filter(c=>c.ef&&!c.efc).length,l:"EF"},{n:f.filter(c=>c.mat==="En place").length,l:"En place"},{n:f.filter(c=>c.mat==="En développement").length,l:"En dév."},{n:f.filter(c=>c.mat==="Non Abouti").length,l:"Non abouti"}].map(s=>`<div class="stat-card"><div class="num">${s.n}</div><div class="label">${s.l}</div></div>`).join("")}
 
 function renderCards(){const f=flt(),mf=mxF(),ml=mxL();document.getElementById("cards-view").innerHTML=f.map(c=>{const b=[];if(c.efc)b.push('<span class="badge badge-efc">EFC</span>');if(c.ef)b.push('<span class="badge badge-ef">EF</span>');if(c.mat)b.push(`<span class="badge ${mc(c.mat)}">${c.mat}</span>`);const tf=FK.reduce((s,k)=>s+(c[k]||0),0),tl=LK.reduce((s,k)=>s+(c[k]||0),0);const ty=c.ty.slice(0,3).map(t=>`<span class="tag">${t}</span>`).join("");return`<div class="card" onclick="showModal(${COMPANIES.indexOf(c)})"><div class="card-head"><span class="card-name">${c.n}</span><div style="display:flex;gap:3px;flex-wrap:wrap">${b.join("")}</div></div><div class="card-region">${c.r} · ${c.sz}</div><div class="card-row">${ty}</div><div class="card-section"><div style="display:flex;gap:14px"><div style="flex:1"><div class="card-section-title">Freins (${tf})</div>${bars(FK,FC,FL,c,mf)}</div><div style="flex:1"><div class="card-section-title">Leviers (${tl})</div>${bars(LK,LC,LL,c,ml)}</div></div></div></div>`}).join("");document.getElementById("count").textContent=f.length}
 
@@ -321,25 +337,36 @@ new Chart(document.getElementById("ch-mat-act"),{type:"bar",data:{labels:matActL
 {label:"En place",data:matActEP,backgroundColor:"#3A5A7C",borderRadius:3}
 ]},plugins:[chartPluginDL],options:{responsive:true,plugins:{legend:{position:"top"}},scales:{y:{beginAtZero:true,grid:{color:"#f0eeea"}},x:{grid:{display:false},ticks:{font:{size:12,weight:"bold"},maxRotation:45,minRotation:25}}}}});
 
-// 6. Leviers — En place, par secteur
+// 6. Leviers synthèse + détail par secteur (En place)
 const enPlace=C.filter(c=>c.mat==="En place");
-const levDS=svcKeys.map((sk,si)=>{
+const levLabelsAll=["Organisationnel","Économique","Humain","Technique","Infrastructure","Réglementaire","Informationnel"];
+const levSynthData=svcKeys.map((sk,si)=>{
   const g=enPlace.filter(c=>c.sv.some(s=>s.includes(sk)));
   return{label:svcNames[si],data:LK.map(k=>sumF(g,k))};
 });
 const levColors=["#3A5A7C","#6082B6","#9AB8D8","#4A7A3A","#8DB84A","#D4C85C","#C47A2A","#D4A85C","#A05050"];
-new Chart(document.getElementById("ch-leviers"),{type:"bar",data:{labels:["Organisationnel","Économique","Humain","Technique","Infrastructure","Réglementaire","Informationnel"],datasets:levDS.map((d,i)=>({label:d.label,data:d.data,backgroundColor:levColors[i],borderRadius:3}))},plugins:[chartPluginDL],options:{responsive:true,plugins:{legend:{position:"top",labels:{font:{size:12,weight:"bold"}}}},scales:{y:{beginAtZero:true,grid:{color:"#f0eeea"}},x:{grid:{display:false},ticks:{font:{size:12,weight:"bold"}}}}}});
+new Chart(document.getElementById("ch-lev-synthese"),{type:"bar",data:{labels:levLabelsAll,datasets:levSynthData.map((d,i)=>({label:d.label,data:d.data,backgroundColor:levColors[i],borderRadius:3}))},plugins:[chartPluginDL],options:{responsive:true,plugins:{legend:{position:"top",labels:{font:{size:12,weight:"bold"}}}},scales:{y:{beginAtZero:true,grid:{color:"#f0eeea"}},x:{grid:{display:false},ticks:{font:{size:12,weight:"bold"}}}}}});
+
+// Individual lever charts per sector
+function makeLevChart(id,sk){
+  const g=enPlace.filter(c=>c.sv.some(s=>s.includes(sk)));
+  const data=LK.map(k=>sumF(g,k));
+  makeBarChart(id,levLabelsAll,data,"#1D9E75");
+}
+makeLevChart("ch-l-concept","Conception");
+makeLevChart("ch-l-matiere","Transformation");
+makeLevChart("ch-l-distrib","Distribution");
+makeLevChart("ch-l-maint","Maintenance");
+makeLevChart("ch-l-presta","Prestation");
+makeLevChart("ch-l-it","Numérique");
+makeLevChart("ch-l-service","Personne");
+makeLevChart("ch-l-logist","Logistique");
+makeLevChart("ch-l-dechets","Déchets");
 
 // 7. Freins global dev + non abouti — horizontal bar (hardcoded)
 new Chart(document.getElementById("ch-freins-global"),{type:"bar",data:{labels:["Freins organisationnels","Freins économiques","Freins humains","Freins techniques","Freins liés aux infrastructures","Freins réglementaires"],datasets:[{label:"Total",data:[118,166,124,68,39,18],backgroundColor:"#6082B6",borderRadius:4}]},plugins:[chartPluginDL],options:{indexAxis:"y",responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,grid:{color:"#f0eeea"},max:180},y:{grid:{display:false},ticks:{font:{size:13,weight:"bold"}}}}}});
 
-// 8. Freins par catégorie (dev+non abouti) par secteur
-const troubled=C.filter(c=>c.mat==="Non Abouti"||c.mat==="En développement");
-const freinCatDS=svcKeys.map((sk,si)=>{
-  const g=troubled.filter(c=>c.sv.some(s=>s.includes(sk)));
-  return{label:svcNames[si],data:FK.map(k=>sumF(g,k))};
-});
-new Chart(document.getElementById("ch-freins-cat"),{type:"bar",data:{labels:freinCatsShort,datasets:freinCatDS.map((d,i)=>({label:d.label,data:d.data,backgroundColor:levColors[i],borderRadius:3}))},plugins:[chartPluginDL],options:{responsive:true,plugins:{legend:{position:"top",labels:{font:{size:12,weight:"bold"}}}},scales:{y:{beginAtZero:true,grid:{color:"#f0eeea"}},x:{grid:{display:false},ticks:{font:{size:12,weight:"bold"}}}}}});
+// 8. (removed)
 
 // 9-17. Individual sector frein charts (hardcoded from Excel)
 makeBarChart("ch-f-concept",freinCatsShort,[37,37,102,37,20,16],"#D4C85C");
