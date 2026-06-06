@@ -429,7 +429,7 @@ tbody tr{cursor:pointer}
 <div class="team-card team-card-prof">
 <div class="team-avatar" style="background:#185FA5">SC</div>
 <div class="team-name">Samuel Cante</div>
-<div class="team-role">Professeur</div>
+<div class="team-role">ENSEIGNANT</div>
 </div>
 </div>
 </div>
